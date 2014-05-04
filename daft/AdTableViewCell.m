@@ -13,6 +13,7 @@
 @synthesize lblTitleCell;
 @synthesize imgCell;
 @synthesize lblPriceCell;
+@synthesize lblCityCell;
 
 - (void)awakeFromNib
 {
@@ -27,10 +28,11 @@
 }
 
 -(void)setAdInformationCell:(FHBsale_ad *)ad{
-    
+    // put ad information in cell components
     [lblTitleCell setText:ad.getFull_address];
     [imgCell setImageWithURL:[NSURL URLWithString:ad.small_thumbnail_url]];
     [lblPriceCell setText:[NSString stringWithFormat:@"%@%@",[ad getPrice],@" €"]];
+    [lblCityCell setText:ad.city];
 }
 
 

@@ -10,6 +10,7 @@
 #import "AFHTTPRequestOperation.h"
 #import "FHBDaftAPIServiceBinding.h"
 #import "FHBsearch_query.h"
+#import "Constants.h"
 #import "FHBRequestResultHandler.h"
 
 @implementation WebServices
@@ -18,9 +19,10 @@
 
 - (void) getListDaft : (NSInteger) page{
     FHBsearch_query *query = [[FHBsearch_query alloc] init];
-    [query setValue:[NSString stringWithFormat:@"%d",page] forKey:@"page"];
+    [query setPage:[NSNumber numberWithInteger:page]];
+    [query setPerpage:[NSNumber numberWithInt:DAFT_API_PER_PAGE]];
     FHBDaftAPIServiceBinding *service = [[FHBDaftAPIServiceBinding alloc] init];
-    [service search_saleAsync:@"7bcfbb1694fe2ef5903550d34e36981c3b170c13" query:query __target:self];
+    [service search_saleAsync:DAFT_API_KEY query:query __target:self];
     
 }
 

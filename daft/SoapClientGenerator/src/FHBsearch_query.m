@@ -588,7 +588,7 @@
         DDXMLElement* __pageItemElement=[__request writeElement:page type:[NSNumber class] name:@"page" URI:@"http://api.daft.ie/v2/" parent:__parent skipNullProperty:__request.SkipNullProperties];
         if(__pageItemElement!=nil)
         {
-            [__pageItemElement setStringValue:self.page];
+            [__pageItemElement setStringValue:[NSString stringWithFormat:@"%@", self.page]];
         }
              
         DDXMLElement* __sort_byItemElement=[__request writeElement:sort_by type:[NSString class] name:@"sort_by" URI:@"http://api.daft.ie/v2/" parent:__parent skipNullProperty:__request.SkipNullProperties];

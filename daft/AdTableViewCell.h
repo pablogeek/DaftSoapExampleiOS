@@ -12,6 +12,7 @@
 @interface AdTableViewCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet UILabel *lblTitleCell;
 @property (weak, nonatomic) IBOutlet UILabel *lblPriceCell;
+@property (weak, nonatomic) IBOutlet UILabel *lblCityCell;
 @property (weak, nonatomic) IBOutlet UIImageView *imgCell;
 
 

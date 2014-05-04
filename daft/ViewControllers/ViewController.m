@@ -10,6 +10,7 @@
 #import "FHBsale_ad.h"
 #import "AdTableViewCell.h"
 #import "FHBpagination.h"
+#import "Constants.h"
 
 
 @interface ViewController ()
@@ -21,7 +22,6 @@
 @end
 
 @implementation ViewController{
-    float reload_distance;
     NSInteger page;
     WebServices *services;
     BOOL isLoading;
@@ -43,11 +43,11 @@
 
 
 - (void) setTableView{
+    //register xib to use a custom cell view in UITableView
     [tableView registerNib:[UINib nibWithNibName:@"AdTableViewCell" bundle:nil ] forCellReuseIdentifier:@"AdTableViewCell"];
     tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     page = 1;
     isLoading=YES;
-    reload_distance = 10;
     [self setLoadingTableView];
 }
 
@@ -76,10 +76,10 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 64.0f;
+    return AD_TABLEVIEW_CELL_HEIGHT;
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+-(UITableViewCell *)tableView:(UITableView *)tableVie cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     //get ad from array
     FHBsale_ad *ad = ads[indexPath.row];
     
@@ -92,23 +92,14 @@
     //set information in each cell
     [cell setAdInformationCell:ad];
     
-    
-    return cell;
-}
-
-
-- (void)scrollViewDidScroll:(UIScrollView *)aScrollView {
-    CGPoint offset = aScrollView.contentOffset;
-    CGRect bounds = aScrollView.bounds;
-    CGSize size = aScrollView.contentSize;
-    UIEdgeInsets inset = aScrollView.contentInset;
-    float y = offset.y + bounds.size.height - inset.bottom;
-    float h = size.height;
-    
-    //get the next page
-    if(y > h + reload_distance && !isLoading && ![self isLastPage]) {
+    //check if You have to download more items
+    if (indexPath.row == [ads count] - 1 && !isLoading && ![self isLastPage]){
+        isLoading = YES;
         [services getListDaft: [self nextPage]];
     }
+    
+    
+    return cell;
 }
 
 - (void) setLoadingTableView{
