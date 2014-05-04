@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "FHBsale_ad.h"
 #import "AdTableViewCell.h"
+#import "FHBpagination.h"
 
 
 @interface ViewController ()
@@ -16,12 +17,18 @@
 @property (nonatomic,strong) FHBsale_results *_results;
 
 
+
 @end
 
-@implementation ViewController
+@implementation ViewController{
+    float reload_distance;
+    NSInteger page;
+    WebServices *services;
+    BOOL isLoading;
+}
 @synthesize ads;
 @synthesize tableView;
-@synthesize _results:
+@synthesize _results;
 
 - (void)viewDidLoad
 {
@@ -30,21 +37,26 @@
 	//init array to add ads
     ads = [[NSMutableArray alloc]init];
     [self setTableView];
+    [self setTitle:@"Daft Pablo Demo"];
     
 }
 
 
 - (void) setTableView{
     [tableView registerNib:[UINib nibWithNibName:@"AdTableViewCell" bundle:nil ] forCellReuseIdentifier:@"AdTableViewCell"];
-    tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    page = 1;
+    isLoading=YES;
+    reload_distance = 10;
+    [self setLoadingTableView];
 }
 
 
 -(void)viewDidAppear:(BOOL)animated{
     //call to download the data from daft.ie
-    WebServices *services = [[WebServices alloc] init];
+    services = [[WebServices alloc] init];
     [services setDelegate:self];
-    [services getListDaft];
+    [services getListDaft:page];
 }
 
 
@@ -84,17 +96,70 @@
     return cell;
 }
 
+
+- (void)scrollViewDidScroll:(UIScrollView *)aScrollView {
+    CGPoint offset = aScrollView.contentOffset;
+    CGRect bounds = aScrollView.bounds;
+    CGSize size = aScrollView.contentSize;
+    UIEdgeInsets inset = aScrollView.contentInset;
+    float y = offset.y + bounds.size.height - inset.bottom;
+    float h = size.height;
+    
+    //get the next page
+    if(y > h + reload_distance && !isLoading && ![self isLastPage]) {
+        [services getListDaft: [self nextPage]];
+    }
+}
+
+- (void) setLoadingTableView{
+    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [spinner startAnimating];
+    spinner.frame = CGRectMake(0, 0, 320, 44);
+    tableView.tableFooterView = spinner;
+}
+
+-(void) removeLoadingTableView{
+    tableView.tableFooterView = nil;
+}
+
+
 #pragma resultsSoapService
 
 -(void)onResultsOK:(FHBsale_results *)resultAds{
-    [ads addObjectsFromArray:resultAds.ads];
-    _results = resultAds;
-    //reload data to show ads
-    [tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
+    if(resultAds){
+        [ads addObjectsFromArray:resultAds.ads];
+        _results = resultAds;
+        //reload data to show ads
+        [tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
+        //remove loading if is the last page
+        if([self isLastPage])
+            [self removeLoadingTableView];
+    }
+    isLoading=NO;
 }
 
 -(void)onResultsError{
-    
+    isLoading = NO;
+    [self removeLoadingTableView];
+}
+
+
+#pragma utils
+
+
+-(BOOL) isLastPage{
+    FHBpagination *pagination = _results.pagination;
+    return pagination.num_pages == pagination.current_page;
+}
+
+- (NSInteger) currentPage{
+    FHBpagination *pagination = _results.pagination;
+    return [pagination.current_page integerValue];
+}
+
+- (NSInteger) nextPage{
+    FHBpagination *pagination = _results.pagination;
+    return [pagination.current_page integerValue]+1;
 }
 
 

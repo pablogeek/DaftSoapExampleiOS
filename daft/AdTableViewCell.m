@@ -12,6 +12,7 @@
 @implementation AdTableViewCell
 @synthesize lblTitleCell;
 @synthesize imgCell;
+@synthesize lblPriceCell;
 
 - (void)awakeFromNib
 {
@@ -29,6 +30,7 @@
     
     [lblTitleCell setText:ad.getFull_address];
     [imgCell setImageWithURL:[NSURL URLWithString:ad.small_thumbnail_url]];
+    [lblPriceCell setText:[NSString stringWithFormat:@"%@%@",[ad getPrice],@" €"]];
 }
 
 

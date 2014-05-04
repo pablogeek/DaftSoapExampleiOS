@@ -16,16 +16,17 @@
 
 @synthesize delegate;
 
--(void)getListDaft{
+- (void) getListDaft : (NSInteger) page{
     FHBsearch_query *query = [[FHBsearch_query alloc] init];
-    [query setValue:@"1" forKey:@"page"];
+    [query setValue:[NSString stringWithFormat:@"%d",page] forKey:@"page"];
     FHBDaftAPIServiceBinding *service = [[FHBDaftAPIServiceBinding alloc] init];
     [service search_saleAsync:@"7bcfbb1694fe2ef5903550d34e36981c3b170c13" query:query __target:self];
+    
 }
 
 - (void)onSuccess:(id)value{
     FHBsale_results *results = value;
-    [delegate onResultsOK:results.ads];
+    [delegate onResultsOK:results];
 }
 
 -(void)onError:(NSError *)error{

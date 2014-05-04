@@ -24,6 +24,6 @@
 
 @property (nonatomic,strong) NSObject<ServiceDelegate> *delegate;
 
-- (void) getListDaft;
+- (void) getListDaft : (NSInteger) page;
 
 @end
